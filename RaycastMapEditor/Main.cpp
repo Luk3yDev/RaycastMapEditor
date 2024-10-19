@@ -1,36 +1,46 @@
-#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
+#include <ctime>
 
-const int tileSize = 32;
+const int tileSize = 24;
 const int mapWidth = 24;
 const int mapHeight = 24;
 
 const int TILE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6 };
 const int numTileTypes = sizeof(TILE_TYPES) / sizeof(TILE_TYPES[0]);
 
-int currentTileIndex = 0; // Index for the current tile type
+int currentTileIndex = 0;
 std::vector<std::vector<int>> worldMap(mapHeight, std::vector<int>(mapWidth, 0));
+
+SDL_Texture* textures[numTileTypes];
+
+void loadTextures(SDL_Renderer* renderer) {
+    for (int i = 1; i < numTileTypes; i++) {
+        std::string fileName = "walls/tile_" + std::to_string(i) + ".bmp";
+        SDL_Surface* rawImage = SDL_LoadBMP(fileName.c_str());        
+        textures[i] = SDL_CreateTextureFromSurface(renderer, rawImage);
+        if (!textures[i]) {
+            std::cerr << "Failed to load wall texture! SDL_Error: " << SDL_GetError() << std::endl;
+        }
+    }
+}
 
 void drawGrid(SDL_Renderer* renderer) {
     for (int x = 0; x < mapWidth; x++) {
         for (int y = 0; y < mapHeight; y++) {
             SDL_Rect rect = { x * tileSize, y * tileSize, tileSize, tileSize };
             int tileType = worldMap[y][x];
-            switch (tileType) {
-            case 0: SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); break;
-            case 1: SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255); break;
-            case 2: SDL_SetRenderDrawColor(renderer, 100, 150, 100, 255); break;
-            case 3: SDL_SetRenderDrawColor(renderer, 70, 70, 70, 255); break;
-            case 4: SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255); break;
-            case 5: SDL_SetRenderDrawColor(renderer, 135, 135, 135, 255); break;
-            case 6: SDL_SetRenderDrawColor(renderer, 190, 190, 190, 255); break;
-            }
-            SDL_RenderFillRect(renderer, &rect);
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Grid color
+
             SDL_RenderDrawRect(renderer, &rect);
+
+            if (tileType >= 0 && tileType < numTileTypes) {
+                SDL_RenderCopy(renderer, textures[tileType], nullptr, &rect);
+            }
+
+            SDL_SetRenderDrawColor(renderer, 150, 50, 200, 255);            
         }
     }
 }
@@ -79,6 +89,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
+    loadTextures(renderer);
+
     bool running = true;
     SDL_Event event;
 
@@ -89,29 +101,33 @@ int main(int argc, char* argv[]) {
             }
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_RIGHT) {
-                    currentTileIndex = (currentTileIndex + 1) % numTileTypes; // Scroll right
+                    currentTileIndex = (currentTileIndex + 1) % numTileTypes;
                 }
                 if (event.key.keysym.sym == SDLK_LEFT) {
-                    currentTileIndex = (currentTileIndex - 1 + numTileTypes) % numTileTypes; // Scroll left
+                    currentTileIndex = (currentTileIndex - 1 + numTileTypes) % numTileTypes;
                 }
                 if (event.key.keysym.sym == SDLK_s) {
-                    saveMap("map.txt");
+                    saveMap("map.rmap");
                 }
             }
             if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x / tileSize;
                 int mouseY = event.button.y / tileSize;
                 if (mouseX < mapWidth && mouseY < mapHeight) {
-                    worldMap[mouseY][mouseX] = TILE_TYPES[currentTileIndex]; // Set the selected tile type
+                    worldMap[mouseY][mouseX] = TILE_TYPES[currentTileIndex];
                 }
             }
         }
 
+        SDL_SetRenderDrawColor(renderer, 15, 4, 15, 255);
         SDL_RenderClear(renderer);
         drawGrid(renderer);
         SDL_RenderPresent(renderer);
     }
 
+    for (int i = 0; i < numTileTypes; ++i) {
+        SDL_DestroyTexture(textures[i]);
+    }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
