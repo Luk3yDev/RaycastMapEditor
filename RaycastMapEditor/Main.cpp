@@ -5,7 +5,7 @@
 #include <string>
 #include <ctime>
 
-const int tileSize = 24;
+const int tileSize = 32;
 const int mapWidth = 24;
 const int mapHeight = 24;
 
@@ -34,13 +34,12 @@ void drawGrid(SDL_Renderer* renderer) {
             SDL_Rect rect = { x * tileSize, y * tileSize, tileSize, tileSize };
             int tileType = worldMap[y][x];
 
-            SDL_RenderDrawRect(renderer, &rect);
-
             if (tileType >= 0 && tileType < numTileTypes) {
                 SDL_RenderCopy(renderer, textures[tileType], nullptr, &rect);
             }
-
-            SDL_SetRenderDrawColor(renderer, 150, 50, 200, 255);            
+            
+            SDL_SetRenderDrawColor(renderer, 150, 50, 200, 255);
+            SDL_RenderDrawRect(renderer, &rect);
         }
     }
 }
