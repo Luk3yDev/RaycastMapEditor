@@ -1,23 +1,32 @@
+#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
 
-#define mapWidth 24
-#define mapHeight 24
-
 const int tileSize = 32;
+const int mapWidth = 24;
+const int mapHeight = 24;
 
+const int TILE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6 };
+const int numTileTypes = sizeof(TILE_TYPES) / sizeof(TILE_TYPES[0]);
+
+int currentTileIndex = 0; // Index for the current tile type
 std::vector<std::vector<int>> worldMap(mapHeight, std::vector<int>(mapWidth, 0));
 
 void drawGrid(SDL_Renderer* renderer) {
     for (int x = 0; x < mapWidth; x++) {
         for (int y = 0; y < mapHeight; y++) {
             SDL_Rect rect = { x * tileSize, y * tileSize, tileSize, tileSize };
-            switch (worldMap[y][x]) {
-            case 1: SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); break; // Wall
-            case 0: SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); break; // Empty
-            default: SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); break; // Custom tile
+            int tileType = worldMap[y][x];
+            switch (tileType) {
+            case 0: SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); break;
+            case 1: SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255); break;
+            case 2: SDL_SetRenderDrawColor(renderer, 100, 150, 100, 255); break;
+            case 3: SDL_SetRenderDrawColor(renderer, 70, 70, 70, 255); break;
+            case 4: SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255); break;
+            case 5: SDL_SetRenderDrawColor(renderer, 135, 135, 135, 255); break;
+            case 6: SDL_SetRenderDrawColor(renderer, 190, 190, 190, 255); break;
             }
             SDL_RenderFillRect(renderer, &rect);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Grid color
@@ -79,6 +88,12 @@ int main(int argc, char* argv[]) {
                 running = false;
             }
             if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_RIGHT) {
+                    currentTileIndex = (currentTileIndex + 1) % numTileTypes; // Scroll right
+                }
+                if (event.key.keysym.sym == SDLK_LEFT) {
+                    currentTileIndex = (currentTileIndex - 1 + numTileTypes) % numTileTypes; // Scroll left
+                }
                 if (event.key.keysym.sym == SDLK_s) {
                     saveMap("map.txt");
                 }
@@ -87,7 +102,7 @@ int main(int argc, char* argv[]) {
                 int mouseX = event.button.x / tileSize;
                 int mouseY = event.button.y / tileSize;
                 if (mouseX < mapWidth && mouseY < mapHeight) {
-                    worldMap[mouseY][mouseX] = (worldMap[mouseY][mouseX] + 1) % 2; // Toggle tile
+                    worldMap[mouseY][mouseX] = TILE_TYPES[currentTileIndex]; // Set the selected tile type
                 }
             }
         }
