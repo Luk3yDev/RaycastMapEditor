@@ -6,16 +6,26 @@
 #include <ctime>
 
 const int tileSize = 32;
-const int mapWidth = 24;
-const int mapHeight = 24;
+const int mapWidth = 25;
+const int mapHeight = 25;
 
-const int TILE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+const int TILE_TYPES[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 const int numTileTypes = sizeof(TILE_TYPES) / sizeof(TILE_TYPES[0]);
 
 int currentTileIndex = 0;
 std::vector<std::vector<int>> worldMap(mapHeight, std::vector<int>(mapWidth, 0));
 
 SDL_Texture* textures[numTileTypes];
+
+struct Sprite
+{
+    double x;
+    double y;
+    int texIndex;
+    SDL_Surface* texture;
+};
+
+Sprite sprite[256];
 
 void loadTextures(SDL_Renderer* renderer) {
     for (int i = 1; i < numTileTypes; i++) {
@@ -110,10 +120,21 @@ int main(int argc, char* argv[]) {
                 }
             }
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                int mouseX = event.button.x / tileSize;
-                int mouseY = event.button.y / tileSize;
-                if (mouseX < mapWidth && mouseY < mapHeight) {
-                    worldMap[mouseY][mouseX] = TILE_TYPES[currentTileIndex];
+                if (event.button.button == SDL_BUTTON_LEFT)
+                {
+                    int mouseX = event.button.x / tileSize;
+                    int mouseY = event.button.y / tileSize;
+                    if (mouseX < mapWidth && mouseY < mapHeight) {
+                        worldMap[mouseY][mouseX] = TILE_TYPES[currentTileIndex];
+                    }
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT)
+                {
+                    int mouseX = event.button.x / tileSize;
+                    int mouseY = event.button.y / tileSize;
+                    if (mouseX < mapWidth && mouseY < mapHeight) {
+                        worldMap[mouseY][mouseX] = 0;
+                    }
                 }
             }
         }
