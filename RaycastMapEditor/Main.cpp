@@ -53,7 +53,6 @@ void drawGrid(SDL_Renderer* renderer) {
     for (int x = 0; x < mapWidth; x++) {
         for (int y = 0; y < mapHeight; y++) {
             SDL_Rect rect = { x * tileSize, y * tileSize, tileSize, tileSize };
-            SDL_Rect spriteRect = { (x * tileSize) + tileSize/2, (y * tileSize) - tileSize/2, tileSize, tileSize };
 
             int tileType = worldMap[y][x];
             if (tileType >= 0 && tileType < numTileTypes) {
@@ -62,7 +61,7 @@ void drawGrid(SDL_Renderer* renderer) {
 
             int spriteType = spriteMap[y][x];
             if (spriteType >= 0 && spriteType < numSpriteTypes) {
-                SDL_RenderCopy(renderer, spriteTextures[spriteType], nullptr, &spriteRect);
+                SDL_RenderCopy(renderer, spriteTextures[spriteType], nullptr, &rect);
             }
             
             SDL_SetRenderDrawColor(renderer, 150, 50, 200, 255);
