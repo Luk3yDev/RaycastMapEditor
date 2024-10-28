@@ -9,7 +9,7 @@ const int tileSize = 24;
 const int mapWidth = 25;
 const int mapHeight = 25;
 
-const int TILE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+const int TILE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 const int numTileTypes = sizeof(TILE_TYPES) / sizeof(TILE_TYPES[0]);
 
 int currentTileIndex = 0;
@@ -17,7 +17,7 @@ std::vector<std::vector<int>> worldMap(mapHeight, std::vector<int>(mapWidth, 0))
 
 SDL_Texture* wallTextures[numTileTypes];
 
-const int SPRITE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6 };
+const int SPRITE_TYPES[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 const int numSpriteTypes = sizeof(SPRITE_TYPES) / sizeof(SPRITE_TYPES[0]);
 
 int currentSpriteIndex = 0;
