@@ -5,7 +5,7 @@
 #include <string>
 #include <ctime>
 
-const int tileSize = 32;
+const int tileSize = 24;
 const int mapWidth = 25;
 const int mapHeight = 25;
 
